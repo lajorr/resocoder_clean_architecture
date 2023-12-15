@@ -28,14 +28,19 @@ void main() {
       //arrange
 
       // this is sort of like defining??
-      // not exactly defining but we have not actually created/ defined/ implemented this "getConcreteNumberTrivia()" function but 
-      // yo lines of code le chai tyo function call vayo vane "Right(tNumberTrivia)" return gara vandai xa hola ???? 
+      // not exactly defining but we have not actually created/ defined/ implemented this "getConcreteNumberTrivia()" function but
+      // yo lines of code le chai tyo function call vayo vane "Right(tNumberTrivia)" return gara vandai xa hola ????
       when(mockNumberTriviaRepository.getConcreteNumberTrivia(any)).thenAnswer(
-        (realInvocation) async => const Right(tNumberTrivia), // right le NumberTrivia ko instance return garxa????
+        (realInvocation) async => const Right(
+            tNumberTrivia), // right le NumberTrivia ko instance return garxa????
       );
 
       //act
-      final result = await usecase.execute(number: tNumber);
+      final result = await usecase(
+        const Params(
+          number: tNumber,
+        ),
+      );
 
       //assert
       expect(result, const Right(tNumberTrivia));

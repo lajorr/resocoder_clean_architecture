@@ -8,5 +8,5 @@ abstract class NumberTriviaRepository {
 
   //these two are use cases????
   Future<Either<Failure, NumberTrivia>>? getConcreteNumberTrivia(int? num);
-  Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia();
+  Future<Either<Failure, NumberTrivia>>? getRandomNumberTrivia();
 }
