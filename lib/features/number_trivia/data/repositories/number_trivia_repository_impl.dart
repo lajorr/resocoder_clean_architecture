@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/exceptions.dart';
 import '../../../../core/error/failures.dart';
-import '../../../../core/platform/network_info.dart';
+import '../../../../core/network/network_info.dart';
 import '../../domain/entities/number_trivia.dart';
 import '../../domain/repositories/number_trivia_repository.dart';
 import '../datasources/number_trivia_local_data_source.dart';
@@ -40,19 +40,31 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
   Future<Either<Failure, NumberTrivia>> _getTrivia(
       _ConcreteOrRandomChooser getRandomOrConcrete) async {
     if (await networkInfo.isConnected) {
+      //* if internet xa vane
       try {
-        // final remoteData = await remoteDataSource.getRandomNumberTrivia();
         final remoteData = await getRandomOrConcrete();
+
+        //? data retrive vayepxi data lai cache gareko
         localDataSource.cacheNumberTrivia(remoteData);
+
+        //? if successful returns the data as NumberTriviaModel
         return Right(remoteData);
       } on ServerException {
+
+        //! On Exeption returns Failure object
         return Left(ServerFailure());
       }
     } else {
+      //* internet xaina!!!
       try {
+        //? cache ma vako data retrieve garxa
         final localTrivia = await localDataSource.getLastNumberTrivia();
+
+        //? if successful returns data as NumberTriviaModel
         return Right(localTrivia);
       } on CacheException {
+
+        //! if there is no data in cache returns Failure Object
         return Left(CacheFailure());
       }
     }
