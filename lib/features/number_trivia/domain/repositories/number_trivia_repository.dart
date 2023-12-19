@@ -7,6 +7,6 @@ abstract class NumberTriviaRepository {
   // so that we dont have to use error exception anywhere else????
 
   //these two are use cases????
-  Future<Either<Failure, NumberTrivia>>? getConcreteNumberTrivia(int? num);
-  Future<Either<Failure, NumberTrivia>>? getRandomNumberTrivia();
+  Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(int? num);
+  Future<Either<Failure, NumberTrivia>> getRandomNumberTrivia();
 }
