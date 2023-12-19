@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
 class NumberTrivia extends Equatable {
@@ -11,4 +12,7 @@ class NumberTrivia extends Equatable {
         text,
         number,
       ];
+
+  @override
+  bool get stringify => true;
 }
