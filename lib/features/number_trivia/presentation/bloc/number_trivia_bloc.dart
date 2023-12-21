@@ -1,4 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:resocoder_clean_architecture/core/error/failures.dart';
@@ -27,23 +29,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     required this.random,
     required this.inputConverter,
   }) : super(Empty()) {
-    on<GetTriviaForConcreteNumber>((event, emit) {
-      final inputEither =
-          inputConverter.stringToUnsignedInteger(event.numberString);
-      inputEither.fold(
-        (failure) => emit(
-          const Error(message: StringConstants.invalidInputFailureMessage),
-        ),
-        (integer) async {
-          emit(Loading());
-          final failureOrTrivia = await concrete(Params(number: integer));
-          failureOrTrivia.fold(
-            (failure) => emit(Error(message: _mapFailureToMessage(failure))),
-            (trivia) => emit(Loaded(numberTrivia: trivia)),
-          );
-        },
-      );
-    });
+    on<GetTriviaForConcreteNumber>(getConcreteTrivia);
 
     on<GetTriviaForRandomNumber>(
       (event, emit) async {
@@ -57,6 +43,26 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
       },
     );
   }
+  FutureOr<void> getConcreteTrivia(
+      GetTriviaForConcreteNumber event, Emitter<NumberTriviaState> emit) async {
+    final inputEither =
+        inputConverter.stringToUnsignedInteger(event.numberString);
+
+    if (inputEither.isLeft()) {
+      inputEither.leftMap(
+          (failure) => emit(Error(message: _mapFailureToMessage(failure))));
+    } else {
+      emit(Loading());
+      final failureOrTrivia =
+          await concrete.call(Params(number: int.parse(event.numberString)));
+      failureOrTrivia.fold(
+          (failure) => emit(Error(message: _mapFailureToMessage(failure))),
+          (trivia) {
+        emit(Loaded(numberTrivia: trivia));
+      });
+    }
+  }
+
   NumberTriviaState get initialState => Empty();
 
   String _mapFailureToMessage(Failure failure) {
@@ -65,6 +71,8 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
         return StringConstants.serverFailureMessage;
       case CacheFailure:
         return StringConstants.cacheFailureMessage;
+      case InvalidInputFailure:
+        return StringConstants.invalidInputFailureMessage;
       default:
         return 'Unexpected Error';
     }

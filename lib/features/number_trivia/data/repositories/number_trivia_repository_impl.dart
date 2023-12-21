@@ -23,8 +23,12 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
 
   //? yeta chai sabai datasources ( remote and local ) bata data auxa ani manipulate garinxa ?? hola
   @override
-  Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(
-      int? num) async {
+  Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(int num) async {
+    // try {
+    //   return Right(await );
+    // } catch (e) {
+    //   return left(ServerFailure());
+    // }
     return _getTrivia(() {
       return remoteDataSource.getConcreteNumberTrivia(num);
     });
@@ -39,6 +43,9 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
 
   Future<Either<Failure, NumberTrivia>> _getTrivia(
       _ConcreteOrRandomChooser getRandomOrConcrete) async {
+    // gets the data and cheches it.
+    // gets cached data when no internet.
+
     if (await networkInfo.isConnected) {
       //* if internet xa vane
       try {
@@ -50,7 +57,6 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
         //? if successful returns the data as NumberTriviaModel
         return Right(remoteData);
       } on ServerException {
-
         //! On Exeption returns Failure object
         return Left(ServerFailure());
       }
@@ -63,7 +69,6 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
         //? if successful returns data as NumberTriviaModel
         return Right(localTrivia);
       } on CacheException {
-
         //! if there is no data in cache returns Failure Object
         return Left(CacheFailure());
       }

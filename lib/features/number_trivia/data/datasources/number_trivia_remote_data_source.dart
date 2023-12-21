@@ -10,7 +10,7 @@ abstract class NumberTriviaRemoteDataSource {
   /// this will call the http://numbersapi.com/{number} endpoint
   ///
   /// and throws [ServerExeption] on all error
-  Future<NumberTriviaModel> getConcreteNumberTrivia(int? num);
+  Future<NumberTriviaModel> getConcreteNumberTrivia(int num);
 
   /// this will call the http://numbersapi.com/random endpoint
   ///
@@ -25,7 +25,7 @@ class NumberTriviaRemoteDataSourceImpl implements NumberTriviaRemoteDataSource {
   });
 
   @override
-  Future<NumberTriviaModel> getConcreteNumberTrivia(int? num) =>
+  Future<NumberTriviaModel> getConcreteNumberTrivia(int num) =>
       _getTriviaFromUrl('http://numbersapi.com/$num');
 
   @override
@@ -41,6 +41,8 @@ class NumberTriviaRemoteDataSourceImpl implements NumberTriviaRemoteDataSource {
     );
 
     if (response.statusCode == 200) {
+      // print('number trivia api hitt');
+      // print(response.body);
       return NumberTriviaModel.fromJson(json.decode(response.body));
     } else {
       throw ServerException();
