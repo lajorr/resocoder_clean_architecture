@@ -8,7 +8,7 @@ import '../repositories/number_trivia_repository.dart';
 
 // a use case should always have a call method??
 
-class GetConcreteNumberTrivia implements UseCase<NumberTrivia?, Params> {
+class GetConcreteNumberTrivia implements UseCase<NumberTrivia, Params> {
   GetConcreteNumberTrivia(this.repository);
   final NumberTriviaRepository repository;
 
@@ -17,7 +17,7 @@ class GetConcreteNumberTrivia implements UseCase<NumberTrivia?, Params> {
   // getConcreteNumberTrivia(8);  // this calls tge call function
 
   @override
-  Future<Either<Failure, NumberTrivia?>> call(Params params) async {
+  Future<Either<Failure, NumberTrivia>> call(Params params) async {
     return await repository.getConcreteNumberTrivia(params.number);
   }
 }

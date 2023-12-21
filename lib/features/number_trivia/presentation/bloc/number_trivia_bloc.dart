@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:resocoder_clean_architecture/core/error/failures.dart';
+import 'package:resocoder_clean_architecture/core/usecase/usecase.dart';
 import 'package:resocoder_clean_architecture/core/utils/input_converter.dart';
 
+import '../../../../constants/strings/string_constants.dart';
 import '../../domain/entities/number_trivia.dart';
 import '../../domain/usecases/get_concrete_number_trivia.dart';
 import '../../domain/usecases/get_random_trivia_repository.dart';
@@ -10,10 +13,7 @@ import '../../domain/usecases/get_random_trivia_repository.dart';
 part 'number_trivia_event.dart';
 part 'number_trivia_state.dart';
 
-const String SERVER_FAILURE_MESSAGE = 'Server Failure';
-const String CACHE_FAILURE_MESSAGE = 'Cache Failure';
-const String INVALID_INPUT_FAILURE_MESSAGE =
-    'Invalid Input - the The number must be a positive number or zero';
+// important to all possible types of failures in bloc
 
 // this is going to call the usecases from domain layer
 class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
@@ -32,11 +32,41 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
           inputConverter.stringToUnsignedInteger(event.numberString);
       inputEither.fold(
         (failure) => emit(
-          const Error(message: INVALID_INPUT_FAILURE_MESSAGE),
+          const Error(message: StringConstants.invalidInputFailureMessage),
         ),
-        (integer) => throw UnimplementedError(),
+        (integer) async {
+          emit(Loading());
+          final failureOrTrivia = await concrete(Params(number: integer));
+          failureOrTrivia.fold(
+            (failure) => emit(Error(message: _mapFailureToMessage(failure))),
+            (trivia) => emit(Loaded(numberTrivia: trivia)),
+          );
+        },
       );
     });
+
+    on<GetTriviaForRandomNumber>(
+      (event, emit) async {
+        // random;
+        emit(Loading());
+        final failureOrTrivia = await random(NoParams());
+        failureOrTrivia.fold(
+          (failure) => emit(Error(message: _mapFailureToMessage(failure))),
+          (trivia) => emit(Loaded(numberTrivia: trivia)),
+        );
+      },
+    );
   }
   NumberTriviaState get initialState => Empty();
+
+  String _mapFailureToMessage(Failure failure) {
+    switch (failure.runtimeType) {
+      case ServerFailure:
+        return StringConstants.serverFailureMessage;
+      case CacheFailure:
+        return StringConstants.cacheFailureMessage;
+      default:
+        return 'Unexpected Error';
+    }
+  }
 }
