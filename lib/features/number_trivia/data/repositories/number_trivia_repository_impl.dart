@@ -24,10 +24,7 @@ class NumberTriviaRepositoryImpl implements NumberTriviaRepository {
   //? yeta chai sabai datasources ( remote and local ) bata data auxa ani manipulate garinxa ?? hola
   @override
   Future<Either<Failure, NumberTrivia>> getConcreteNumberTrivia(int num) async {
-    // try {
-    //   return Right(await );
-    // } catch (e) {
-    //   return left(ServerFailure());
+    
     // }
     return _getTrivia(() {
       return remoteDataSource.getConcreteNumberTrivia(num);

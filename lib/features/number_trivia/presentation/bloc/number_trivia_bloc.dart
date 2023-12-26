@@ -35,7 +35,7 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
       (event, emit) async {
         // random;
         emit(Loading());
-        final failureOrTrivia = await random(NoParams());
+        final failureOrTrivia = await random.call(NoParams());
         failureOrTrivia.fold(
           (failure) => emit(Error(message: _mapFailureToMessage(failure))),
           (trivia) => emit(Loaded(numberTrivia: trivia)),
@@ -78,3 +78,9 @@ class NumberTriviaBloc extends Bloc<NumberTriviaEvent, NumberTriviaState> {
     }
   }
 }
+
+
+
+
+
+
